@@ -1,0 +1,15 @@
+modules:
+  macro:
+    - key: ranking-table
+      function: main
+      title: ranking-table
+      description: Inserts a ranking table
+  function:
+    - key: main
+      handler: index.run
+app:
+  id: ari:cloud:ecosystem::app/199a6ed7-01c7-44e4-8348-dfd4b13a5e9e
+permissions:
+  scopes:
+    - storage:app
+    - read:confluence-content.summary
