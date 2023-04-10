@@ -1,6 +1,6 @@
-# Forge Hello World
+# Confluence Ranking Table
 
-This project contains a Forge app written in Javascript that displays `Hello World!` in a Confluence macro. 
+This project contains a Forge app written in Javascript that adds a Confluence macro to create a ranking table. 
 
 See [developer.atlassian.com/platform/forge/](https://developer.atlassian.com/platform/forge) for documentation and tutorials explaining Forge.
 
