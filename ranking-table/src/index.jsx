@@ -45,7 +45,6 @@ const addTopic = (setOpen) => {
 
 const deleteTopic = (topics, topic, updateTopics, storeTopics) => {
   const idx = topics.indexOf(topic);
-  console.log("index: "+idx);
   if (idx >= 0) {
     topics.splice(idx, 1)
   }
@@ -135,7 +134,6 @@ const RankingTable = ({ topics, setModalOpen, updateTopics, currentUser, storeTo
 const App = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const context = useProductContext();
-  //console.log(context);
   const currentUser = context.accountId;
   const spaceKey = context.spaceKey;
   const contentId = context.contentId;
@@ -143,9 +141,7 @@ const App = () => {
 
   const { fetchTopics, storeTopics } = useStorage(spaceKey, contentId, localId);
 
-  console.log("current User: "+ currentUser);
   const [topics, updateTopics] = useState(async () => await fetchTopics());
-  console.log(topics);
 
   return (
     <Fragment>
