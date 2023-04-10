@@ -13,8 +13,8 @@ interface Topic {
 
 
 
-export function useStorage(spaceKey: string, contentId: string) {
-  const _storageKey: string = "com.ranking-table."+ spaceKey + "." + contentId;
+export function useStorage(spaceKey: string, contentId: string, localId: string) {
+  const _storageKey: string = "com.ranking-table."+ localId + "." + spaceKey + "." + contentId;
   const storageKey: string = _storageKey.replace(/[^a-zA-Z0-9:._\s-#]/g, "_");
   console.log("using storage", _storageKey, storageKey);
 

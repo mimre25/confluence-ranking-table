@@ -135,11 +135,13 @@ const RankingTable = ({ topics, setModalOpen, updateTopics, currentUser, storeTo
 const App = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const context = useProductContext();
+  //console.log(context);
   const currentUser = context.accountId;
   const spaceKey = context.spaceKey;
   const contentId = context.contentId;
+  const localId = context.localId;
 
-  const { fetchTopics, storeTopics } = useStorage(spaceKey, contentId);
+  const { fetchTopics, storeTopics } = useStorage(spaceKey, contentId, localId);
 
   console.log("current User: "+ currentUser);
   const [topics, updateTopics] = useState(async () => await fetchTopics());
