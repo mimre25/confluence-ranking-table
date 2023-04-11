@@ -12,4 +12,3 @@ app:
 permissions:
   scopes:
     - storage:app
-    - read:confluence-content.summary

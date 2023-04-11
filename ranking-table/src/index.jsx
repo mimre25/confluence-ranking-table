@@ -4,17 +4,6 @@ useProductContext, useState, Table, Head, Row, Cell, Button, ModalDialog } from
 import api, {route} from "@forge/api";
 import { useStorage } from "./storage";
 
-
-
-const fetchCommentsForContent = async (contentId) => {
-  const res = await api
-    .asUser()
-    .requestConfluence(route`/wiki/rest/api/content/${contentId}/child/comment`);
-
-  const data = await res.json();
-  return data.results;
-};
-
 const addTopicToList = (topics, data, currentUser, storeTopics) => {
   topics.push({topic: data.topic, votes: 0, voters: [], creator: currentUser});
   (async() => { storeTopics(topics) })(); 
