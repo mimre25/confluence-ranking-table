@@ -4,20 +4,23 @@ useProductContext, useState, Table, Head, Row, Cell, Button, ModalDialog } from
 import api, {route} from "@forge/api";
 import { useStorage } from "./storage";
 
-const addTopicToList = (topics, data, currentUser, storeTopics) => {
-  topics.push({topic: data.topic, votes: 0, voters: [], creator: currentUser});
-  (async() => { storeTopics(topics) })(); 
+const addTopicToList = async (data, currentUser, storeTopics) => {
+  await storeTopics(function (topics) {
+      topics.push({topicName: data.topic, votes: 0, voters: [], creator: currentUser});
+      return topics;
+    }
+  ); 
+  
 };
 
 
 
 const Modal = (topics, isOpen, setOpen, currentUser, storeTopics) => {
-  const [size, setSize] = useState("medium");
   return isOpen && (
         <ModalDialog header="Suggest a topic" onClose={() => setOpen(false)}>
           <Form
-            onSubmit={data => {
-              addTopicToList(topics, data, currentUser, storeTopics);
+            onSubmit={async (data) => {
+              await addTopicToList(data, currentUser, storeTopics);
               setOpen(false);
             }}
           >
@@ -32,42 +35,60 @@ const addTopic = (setOpen) => {
 };
 
 
-const deleteTopic = (topics, topic, updateTopics, storeTopics) => {
-  const idx = topics.indexOf(topic);
-  if (idx >= 0) {
-    topics.splice(idx, 1)
+const deleteTopic = async (topic, storeTopics) => {
+  //console.log("topic:", topic);
+  await storeTopics(function (topics) {
+    let idx = -1
+    for (let i = 0; i < topics.length; ++i) {
+      if (topics[i]["topicName"] == topic["topicName"]) {
+        idx = i;
+      }
+    }
+    if (idx >= 0) {
+      topics.splice(idx, 1)
+    }
+    return topics;
+  });
+};
+
+
+function addVote(topics, topicName, currentUser) {
+  for (const topic of topics) {
+    if (topic["topicName"] == topicName && !(topic["voters"].includes(currentUser))) {
+      topic["votes"] +=1;
+      topic["voters"].push(currentUser);
+    }
   }
-
-
-  (async () => { storeTopics(topics) }) ();
-  updateTopics(topics)
+  return topics
 };
 
-
-function addVote(topics, topic, currentUser) {
-  topic["votes"] +=1;
-  topic["voters"].push(currentUser);
-};
-
-function removeVote(topics, topic, currentUser) {
-  topic["votes"] -=1;
-  const idx = topic["voters"].indexOf(currentUser);
-  if (idx >= 0) {
-    topic["voters"].splice(idx, 1);
+function removeVote(topics, topicName, currentUser) {
+  for (const topic of topics) {
+    if (topic["topicName"] == topicName) {
+      const idx = topic["voters"].indexOf(currentUser);
+      if (idx >= 0) {
+        topic["votes"] -=1;
+        topic["voters"].splice(idx, 1);
+      }
+    }
+    
   }
+  return topics;  
 };
 
 
 
-const updateVote = (topics, topic, updateTopics, currentUser, storeTopics) => {
+const updateVote = async (topic, currentUser, storeTopics) => {
+  //console.log(topic);
   if (topic["voters"].includes(currentUser)) {
-    removeVote(topics, topic, currentUser);
+    await storeTopics(function(topics) {
+      return removeVote(topics, topic["topicName"], currentUser);
+    });
   } else {
-    addVote(topics, topic, currentUser);
+    await storeTopics(function(topics) {
+      return addVote(topics, topic["topicName"], currentUser);
+    });
   }
-
-  (async () => { storeTopics(topics) }) ();
-  updateTopics(topics)
 };
 
 
@@ -76,7 +97,7 @@ const VoteButton = ({ topic, currentUser, onClick }) => {
   return <Button text={icon} appearance="subtle" onClick={onClick}/>
 };
 
-const RankingTable = ({ topics, setModalOpen, updateTopics, currentUser, storeTopics }) => {
+const RankingTable = ({ topics, setModalOpen, currentUser, storeTopics }) => {
   return (
   <Fragment>
     <Table>
@@ -94,12 +115,12 @@ const RankingTable = ({ topics, setModalOpen, updateTopics, currentUser, storeTo
          topics.sort((a,b) => b.votes - a.votes).map(entry => (
            <Row>
              <Cell>
-               <Text>{entry.topic}</Text>
+               <Text>{entry.topicName}</Text>
              </Cell>
              <Cell>
                { (entry.creator == currentUser) && 
                  (
-                   <Button text="🗑️" appearance="subtle" onClick={() => deleteTopic(topics, entry, updateTopics, storeTopics)}/>
+                   <Button text="🗑️" appearance="subtle" onClick={async () => await deleteTopic(entry, storeTopics)}/>
                  )
                }
              </Cell>
@@ -107,14 +128,14 @@ const RankingTable = ({ topics, setModalOpen, updateTopics, currentUser, storeTo
                <Text>{entry.votes}</Text>
              </Cell>
              <Cell>
-               <VoteButton topic={entry} currentUser={currentUser} onClick={() => updateVote(topics, entry, updateTopics, currentUser, storeTopics)}/>
+               <VoteButton topic={entry} currentUser={currentUser} onClick={async () => await updateVote(entry, currentUser, storeTopics)}/>
              </Cell>
            </Row>
          ))
        }
      </Table>
      <Button text="➕ Add a topic" onClick={() => {addTopic(setModalOpen);}}/>
-     </Fragment>
+   </Fragment>
   );
 };
 
@@ -128,13 +149,12 @@ const App = () => {
   const contentId = context.contentId;
   const localId = context.localId;
 
-  const { fetchTopics, storeTopics } = useStorage(spaceKey, contentId, localId);
+  const { topics, storeTopics } = useStorage(spaceKey, contentId, localId);
 
-  const [topics, updateTopics] = useState(async () => await fetchTopics());
 
   return (
     <Fragment>
-      <RankingTable topics={topics} setModalOpen={setModalOpen} updateTopics={updateTopics} currentUser={currentUser} storeTopics={storeTopics} />
+      <RankingTable topics={topics} setModalOpen={setModalOpen} currentUser={currentUser} storeTopics={storeTopics} />
       {Modal(topics, isModalOpen, setModalOpen, currentUser, storeTopics)}
     </Fragment>
     ); 
