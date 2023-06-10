@@ -15,9 +15,9 @@ function createTopic(
   votes: number = -1
 ): Topic {
   const topic = {
-    topicName: topicName,
-    creator: creator,
-    voters: voters,
+    topicName,
+    creator,
+    voters,
     votes: 0,
   };
   topic.votes = votes === -1 ? topic.voters.length : votes;
@@ -35,7 +35,7 @@ async function _storeTopics(storageKey: string, updateFun) {
 }
 
 async function fetchTopics(storageKey: string): Promise<Topic[]> {
-  console.log("fetching topics...");
+  // console.log("fetching topics...");
   const topics = await storage.get(storageKey);
 
   // console.log(topics);
@@ -59,7 +59,7 @@ export function useStorage(
   return {
     topics,
     async storeTopics(updateFun) {
-      console.log("storing topics...");
+      // console.log("storing topics...");
       const updatedTopics = await _storeTopics(storageKey, updateFun);
       setTopics(updatedTopics);
     },

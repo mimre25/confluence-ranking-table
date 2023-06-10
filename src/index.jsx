@@ -20,7 +20,7 @@ import api, { route } from "@forge/api";
 import { useStorage } from "./storage";
 
 const addTopicToList = async (data, currentUser, storeTopics) => {
-  await storeTopics(function (topics) {
+  await storeTopics((topics) => {
     topics.push({
       topicName: data.topic,
       votes: 0,
@@ -34,7 +34,7 @@ const addTopicToList = async (data, currentUser, storeTopics) => {
 const Modal = (topics, isOpen, setOpen, currentUser, storeTopics) => {
   return (
     isOpen && (
-      <ModalDialog header="Suggest a topic" onClose={() => setOpen(false)}>
+      <ModalDialog header="Suggest a topic" onClose={() => {setOpen(false);}}>
         <Form
           onSubmit={async (data) => {
             await addTopicToList(data, currentUser, storeTopics);
@@ -53,11 +53,11 @@ const addTopic = (setOpen) => {
 };
 
 const deleteTopic = async (topic, storeTopics) => {
-  //console.log("topic:", topic);
-  await storeTopics(function (topics) {
+  // console.log("topic:", topic);
+  await storeTopics((topics) => {
     let idx = -1;
     for (let i = 0; i < topics.length; ++i) {
-      if (topics[i]["topicName"] == topic["topicName"]) {
+      if (topics[i].topicName === topic.topicName) {
         idx = i;
       }
     }
@@ -71,11 +71,11 @@ const deleteTopic = async (topic, storeTopics) => {
 function addVote(topics, topicName, currentUser) {
   for (const topic of topics) {
     if (
-      topic["topicName"] == topicName &&
-      !topic["voters"].includes(currentUser)
+      topic.topicName === topicName &&
+      !topic.voters.includes(currentUser)
     ) {
-      topic["votes"] += 1;
-      topic["voters"].push(currentUser);
+      topic.votes += 1;
+      topic.voters.push(currentUser);
     }
   }
   return topics;
@@ -83,11 +83,11 @@ function addVote(topics, topicName, currentUser) {
 
 function removeVote(topics, topicName, currentUser) {
   for (const topic of topics) {
-    if (topic["topicName"] == topicName) {
-      const idx = topic["voters"].indexOf(currentUser);
+    if (topic.topicName === topicName) {
+      const idx = topic.voters.indexOf(currentUser);
       if (idx >= 0) {
-        topic["votes"] -= 1;
-        topic["voters"].splice(idx, 1);
+        topic.votes -= 1;
+        topic.voters.splice(idx, 1);
       }
     }
   }
@@ -95,20 +95,20 @@ function removeVote(topics, topicName, currentUser) {
 }
 
 const updateVote = async (topic, currentUser, storeTopics) => {
-  //console.log(topic);
-  if (topic["voters"].includes(currentUser)) {
-    await storeTopics(function (topics) {
-      return removeVote(topics, topic["topicName"], currentUser);
+  // console.log(topic);
+  if (topic.voters.includes(currentUser)) {
+    await storeTopics((topics) => {
+      return removeVote(topics, topic.topicName, currentUser);
     });
   } else {
-    await storeTopics(function (topics) {
-      return addVote(topics, topic["topicName"], currentUser);
+    await storeTopics((topics) => {
+      return addVote(topics, topic.topicName, currentUser);
     });
   }
 };
 
 const VoteButton = ({ topic, currentUser, onClick }) => {
-  const icon = topic["voters"].includes(currentUser) ? "👎" : "👍";
+  const icon = topic.voters.includes(currentUser) ? "👎" : "👍";
   return <Button text={icon} appearance="subtle" onClick={onClick} />;
 };
 
@@ -134,7 +134,7 @@ const RankingTable = ({ topics, setModalOpen, currentUser, storeTopics }) => {
                 <Text>{entry.topicName}</Text>
               </Cell>
               <Cell>
-                {entry.creator == currentUser && (
+                {entry.creator === currentUser && (
                   <Button
                     text="🗑️"
                     appearance="subtle"

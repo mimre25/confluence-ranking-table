@@ -1,12 +1,12 @@
 # Confluence Ranking Table
 
-This project contains a Forge app written in Javascript that adds a Confluence macro to create a ranking table. 
+This project contains a Forge app written in Javascript that adds a Confluence macro to create a ranking table.
 
-See [developer.atlassian.com/platform/forge/](https://developer.atlassian.com/platform/forge) for documentation and tutorials explaining Forge.
+See [developer.atlassian.com/platform/forge/](https:// developer.atlassian.com/platform/forge) for documentation and tutorials explaining Forge.
 
 ## Requirements
 
-See [Set up Forge](https://developer.atlassian.com/platform/forge/set-up-forge/) for instructions to get set up.
+See [Set up Forge](https:// developer.atlassian.com/platform/forge/set-up-forge/) for instructions to get set up.
 
 ## Quick start
 
@@ -34,4 +34,4 @@ forge tunnel
 
 ## Support
 
-See [Get help](https://developer.atlassian.com/platform/forge/get-help/) for how to get help and provide feedback.
+See [Get help](https:// developer.atlassian.com/platform/forge/get-help/) for how to get help and provide feedback.
