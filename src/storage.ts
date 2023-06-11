@@ -1,67 +1,60 @@
-import ForgeUI, { useState } from "@forge/ui";
 import { storage } from "@forge/api";
+import ForgeUI, { useState } from "@forge/ui";
 
-interface Topic {
-  topicName: string;
-  votes: number;
-  voters: string[];
-  creator: string;
-}
+import { createTopic, Topic } from "./topicHandling";
 
-function createTopic(
-  topicName: string,
-  creator: string,
-  voters: string[],
-  votes: number = -1
-): Topic {
-  const topic = {
-    topicName,
-    creator,
-    voters,
-    votes: 0,
-  };
-  topic.votes = votes === -1 ? topic.voters.length : votes;
+export type UpdateFunction = (topics: Topic[]) => Topic[];
+export type StoreTopicsFunction = (updateFun: UpdateFunction) => Promise<void>;
 
-  return topic;
-}
-
-async function _storeTopics(storageKey: string, updateFun) {
+const _storeTopics = async (
+  storageKey: string,
+  updateFun: UpdateFunction,
+): Promise<Topic[]> => {
   const previousTopics = await fetchTopics(storageKey);
   const outTopics = updateFun(previousTopics);
-  // console.log("previoustopics:", previousTopics);
-  // console.log("outTopics:", outTopics);
+  // Console.log("previoustopics:", previousTopics);
+  // Console.log("outTopics:", outTopics);
   await storage.set(storageKey, outTopics);
-  return outTopics;
-}
 
-async function fetchTopics(storageKey: string): Promise<Topic[]> {
-  // console.log("fetching topics...");
+  return outTopics;
+};
+
+const fetchTopics = async (storageKey: string): Promise<Topic[]> => {
+  // Console.log("fetching topics...");
   const topics = await storage.get(storageKey);
 
-  // console.log(topics);
+  // Console.log(topics);
   if (!topics) {
     return [];
   }
-  return topics;
-}
 
-export function useStorage(
+  return topics as Topic[];
+};
+
+type _storeUpdateFun = (t: Topic[]) => void;
+export interface UseStorageInterface {
+  storeTopics: StoreTopicsFunction;
+  topics: Topic[];
+}
+export const useStorage = (
   spaceKey: string,
   contentId: string,
-  localId: string
-) {
-  const _storageKey: string =
-    "com.ranking-table." + localId + "." + spaceKey + "." + contentId;
-  const storageKey: string = _storageKey.replace(/[^a-zA-Z0-9:._\s-#]/g, "_");
-  // console.log("rending..");
+  localId: string,
+): UseStorageInterface => {
+  const _storageKey = `com.ranking-table.${localId}.${spaceKey}.${contentId}`;
+  const storageKey = _storageKey.replace(/[^a-zA-Z0-9:._\s-#]/g, "_");
+  // Console.log("rending..");
 
-  const [topics, setTopics] = useState(() => fetchTopics(storageKey));
+  const [topics, setTopics]: [Topic[], _storeUpdateFun] = useState(
+    (): Promise<Topic[]> => fetchTopics(storageKey),
+  );
+
   return {
     topics,
-    async storeTopics(updateFun) {
-      // console.log("storing topics...");
+    async storeTopics(updateFun: UpdateFunction) {
+      // Console.log("storing topics...");
       const updatedTopics = await _storeTopics(storageKey, updateFun);
       setTopics(updatedTopics);
     },
   };
-}
+};

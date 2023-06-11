@@ -1,9 +1,16 @@
 {
     "defaultSeverity": "error",
     "extends": [
-        "tslint:recommended"
+        "tslint:all"
     ],
     "jsRules": {},
-    "rules": {},
+    "rules": {
+      "interface-name": [true, "never-prefix"],
+      "completed-docs": [false],
+      "typedef": [true, "arrow-call-signature", "arrow-parameter", "property-declaraition", "object-destructuring", "array-destructuring"],
+      "variable-name": [true, "check-format", "require-const-for-all-caps", "allow-leading-underscore"],
+      "ban-ts-ignore": [false],
+      "match-default-export-name": [false]
+    },
     "rulesDirectory": []
 }
