@@ -12,10 +12,12 @@ import ForgeUI, {
   Table,
   Text,
   TextField,
+  useConfig,
   useProductContext,
   useState,
 } from "@forge/ui";
 
+import { AdminConfig, defaultConfig, DeletionMode } from "./config";
 import {
   StoreTopicsFunction,
   useStorage,
@@ -33,6 +35,14 @@ import {
 type ForgeComponent = any;
 
 type OnClickFunction = () => Promise<void>;
+
+const evaluateDeletion = (
+  deletionMode: DeletionMode,
+  creator: string,
+  currentUser: string,
+): boolean =>
+  deletionMode === DeletionMode.Everyone ||
+  (deletionMode === DeletionMode.CreatorOnly && creator === currentUser);
 
 // tslint:disable-next-line:variable-name
 const Modal = (
@@ -82,8 +92,10 @@ const RankingTable = ({
   setModalOpen,
   currentUser,
   storeTopics,
+  deletionMode,
 }: {
   currentUser: string;
+  deletionMode: DeletionMode;
   storeTopics: StoreTopicsFunction;
   topics: Topic[];
   setModalOpen(b: boolean): void;
@@ -111,7 +123,11 @@ const RankingTable = ({
               <Cell>
                 {
                   // tslint:disable-next-line:strict-boolean-expressions
-                  entry.creator === currentUser && (
+                  evaluateDeletion(
+                    deletionMode,
+                    entry.creator,
+                    currentUser,
+                  ) && (
                     <Button
                       text="🗑️"
                       appearance="subtle"
@@ -163,6 +179,8 @@ const App = (): ForgeComponent => {
     localId,
   );
 
+  const config: AdminConfig = (useConfig() as AdminConfig) || defaultConfig;
+
   return (
     <Fragment>
       <RankingTable
@@ -170,6 +188,7 @@ const App = (): ForgeComponent => {
         setModalOpen={setModalOpen}
         currentUser={currentUser}
         storeTopics={storeTopics}
+        deletionMode={config.deletionMode}
       />
       {
         // tslint:disable-next-line: no-unsafe-any
