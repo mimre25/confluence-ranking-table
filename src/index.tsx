@@ -14,6 +14,7 @@ import ForgeUI, {
   TextField,
   useConfig,
   useProductContext,
+  User,
   useState,
 } from "@forge/ui";
 
@@ -106,6 +107,9 @@ const RankingTable = ({
         <Cell>
           <Heading size="large">Topic</Heading>
         </Cell>
+        <Cell>
+          <Heading size="large">Added by</Heading>
+        </Cell>
         <Cell></Cell>
         <Cell>
           <Heading size="large">Votes</Heading>
@@ -119,6 +123,9 @@ const RankingTable = ({
             <Row>
               <Cell>
                 <Text>{entry.topicName}</Text>
+              </Cell>
+              <Cell>
+                <User accountId={entry.creator} />
               </Cell>
               <Cell>
                 {
