@@ -16,6 +16,8 @@ import ForgeUI, {
   useProductContext,
   User,
   useState,
+  Select,
+  Option,
 } from "@forge/ui";
 
 import { AdminConfig, defaultConfig, DeletionMode } from "./config";
@@ -67,7 +69,11 @@ const Modal = (
           setOpen(false);
         }}
       >
-        <TextField label="topic" name="topic" />
+        <TextField label="Topic" name="topicName" />
+        <Select label="Category" name="topicCategory">
+          <Option label="Volunteer" value="Volunteer"/>
+          <Option label="Request" value="Request"/>
+        </Select> 
       </Form>
     </ModalDialog>
   );
@@ -108,6 +114,9 @@ const RankingTable = ({
           <Heading size="large">Topic</Heading>
         </Cell>
         <Cell>
+          <Heading size="large">Category</Heading>
+        </Cell>
+        <Cell>
           <Heading size="large">Added by</Heading>
         </Cell>
         <Cell></Cell>
@@ -123,6 +132,9 @@ const RankingTable = ({
             <Row>
               <Cell>
                 <Text>{entry.topicName}</Text>
+              </Cell>
+              <Cell>
+                <Text>{entry.topicCategory}</Text>
               </Cell>
               <Cell>
                 <User accountId={entry.creator} />
