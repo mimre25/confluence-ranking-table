@@ -4,16 +4,19 @@ import { StoreTopicsFunction } from "./storage";
 export interface Topic {
   creator: string;
   topicName: string;
+  topicCategory: string;
   voters: string[];
   votes: number;
 }
 
 export interface NewTopicData {
-  topic: string;
+  topicName: string;
+  topicCategory: string;
 }
 
 export const createTopic = (
   topicName: string,
+  topicCategory: string,
   creator: string,
   voters: string[],
   votes: number = -1,
@@ -21,6 +24,7 @@ export const createTopic = (
   const topic = {
     creator,
     topicName,
+    topicCategory,
     voters,
     votes: 0,
   };
@@ -107,7 +111,8 @@ export const addTopicToList = async (
   await storeTopics((topics: Topic[]): Topic[] => {
     topics.push({
       creator: currentUser,
-      topicName: data.topic,
+      topicName: data.topicName,
+      topicCategory: data.topicCategory,
       voters: [],
       votes: 0,
     });
